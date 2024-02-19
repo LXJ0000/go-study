@@ -9,12 +9,12 @@ type RandomizedSet struct {
 	mp   map[int]int
 }
 
-func Constructor() RandomizedSet {
-	return RandomizedSet{
-		nums: []int{},
-		mp:   map[int]int{},
-	}
-}
+//func Constructor() RandomizedSet {
+//	return RandomizedSet{
+//		nums: []int{},
+//		mp:   map[int]int{},
+//	}
+//}
 
 func (r *RandomizedSet) Insert(val int) bool {
 	if _, ok := r.mp[val]; !ok {
