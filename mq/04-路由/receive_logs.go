@@ -3,6 +3,7 @@ package main
 import (
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
+	"os"
 )
 
 func failOnErr(err error, msg string) {
@@ -20,19 +21,19 @@ func main() {
 	failOnErr(err, "声明Channel失败")
 	defer conn.Close()
 
-	err = ch.ExchangeDeclare(
-		"logs",
-		"fanout",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-	failOnErr(err, "声明Exchange失败")
+	//err = ch.ExchangeDeclare(
+	//	"logs",
+	//	"fanout",
+	//	true,
+	//	false,
+	//	false,
+	//	false,
+	//	nil,
+	//)
+	//failOnErr(err, "声明Exchange失败")
 
 	q, err := ch.QueueDeclare(
-		"", // 随机key 随机定义一个队列 因为生产者没有定义队列 而是交换机 因此不需要特定队列
+		"",
 		false,
 		false,
 		true,
@@ -41,14 +42,22 @@ func main() {
 	)
 	failOnErr(err, "声明队列失败")
 
-	err = ch.QueueBind(
-		q.Name,
-		"",
-		"logs",
-		false,
-		nil,
-	)
-	failOnErr(err, "队列绑定失败")
+	if len(os.Args) < 2 {
+		log.Printf("Usage: %s [info] [warning] [error]", os.Args[0])
+		os.Exit(0)
+	}
+
+	for _, s := range os.Args[1:] {
+		log.Printf("Binding queue %s to exchange %s with routing key %s",
+			q.Name, "logs_direct", s)
+		err = ch.QueueBind(
+			q.Name,        // queue name
+			s,             // routing key
+			"logs_direct", // exchange
+			false,
+			nil)
+		failOnErr(err, "Failed to bind a queue")
+	}
 
 	msgs, err := ch.Consume(
 		q.Name,
