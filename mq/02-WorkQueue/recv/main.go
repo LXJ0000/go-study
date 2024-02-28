@@ -32,10 +32,10 @@ func main() {
 		nil,      // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
-	//err = ch.Qos(1, // 每次取一个消费
-	//	0,     // 消息大小无限制
-	//	false, //仅适用于当前消费者
-	//) // 保证公平分发
+	err = ch.Qos(1, // 每次取一个消费
+		0,     // 消息大小无限制
+		false, //仅适用于当前消费者
+	) // 保证公平分发
 
 	msgs, err := ch.Consume(
 		q.Name, // queue

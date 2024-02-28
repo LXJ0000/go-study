@@ -37,7 +37,7 @@ func main() {
 
 	body := "Hello World!"
 	err = ch.PublishWithContext(ctx,
-		"",     // exchange
+		"",     // exchange 空则为默认
 		q.Name, // routing key
 		false,  // mandatory
 		false,  // immediate
