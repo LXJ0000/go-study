@@ -21,10 +21,9 @@ func main() {
 	failOnErr(err, "声明Channel失败")
 	defer conn.Close()
 
-	// 其实好像可以省略掉 前提是生产者先定义好 不然会报错 - 找不到Exchange
 	err = ch.ExchangeDeclare(
-		"logs_direct",
-		"direct",
+		"logs_topic",
+		"topic",
 		true,
 		false,
 		false,
@@ -44,17 +43,17 @@ func main() {
 	failOnErr(err, "声明队列失败")
 
 	if len(os.Args) < 2 {
-		log.Printf("Usage: %s [info] [warning] [error]", os.Args[0])
+		log.Printf("Usage: %s [binding_key]...", os.Args[0])
 		os.Exit(0)
 	}
 
 	for _, s := range os.Args[1:] {
 		log.Printf("Binding queue %s to exchange %s with routing key %s",
-			q.Name, "logs_direct", s)
+			q.Name, "logs_topic", s)
 		err = ch.QueueBind(
-			q.Name,        // queue name
-			s,             // routing key
-			"logs_direct", // exchange
+			q.Name,       // queue name
+			s,            // routing key
+			"logs_topic", // exchange
 			false,
 			nil)
 		failOnErr(err, "Failed to bind a queue")
